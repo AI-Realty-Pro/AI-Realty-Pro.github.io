@@ -11,6 +11,7 @@
 <body>
     <h1>AI Receptionist for Real Estate Teams</h1>
     <p>Convert 40% more leads for half the cost - $2,000/month</p>
-    <a href="https://calendly.com/your-link" class="button">Book Free Demo</a>
+    <a href="https://calendly.com/ai-m-global-media/demo" class="button">Schedule Your Free Demo</a>
+
 </body>
 </html>
