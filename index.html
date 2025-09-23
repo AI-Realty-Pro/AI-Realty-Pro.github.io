@@ -117,5 +117,120 @@
     <button onclick="calculateROI()">Calculate Savings</button>
     <div id="result"></div>
 </div>
+
+
+    <!-- ROI Calculator Section -->
+<section id="roi-calculator" style="background: white; padding: 40px; border-radius: 10px; margin: 40px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; margin-bottom: 30px;">Calculate Your Potential Savings</h2>
+    
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Monthly Phone Leads:</label>
+                <input type="number" id="monthlyLeads" placeholder="e.g., 100" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Avg Commission:</label>
+                <input type="number" id="commission" value="12000" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+        </div>
+
+        <button onclick="calculateROI()" style="background: #ff6b6b; color: white; padding: 15px 30px; border: none; border-radius: 5px; width: 100%; font-size: 16px; cursor: pointer; margin-bottom: 20px;">Calculate My ROI</button>
+        
+        <!-- Dynamic Summary Section -->
+        <div id="roi-summary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 10px; margin-bottom: 20px; display: none;">
+            <h3 style="margin-bottom: 15px; text-align: center;">📈 Your Personalized Analysis</h3>
+            <div id="summary-content" style="line-height: 1.6;"></div>
+        </div>
+        
+        <!-- Detailed Results -->
+        <div id="roi-results" style="display: none;">
+            <h3 style="color: #28a745; margin-bottom: 15px;">Detailed Breakdown:</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                    <h4 style="margin-bottom: 10px;">Current Loss</h4>
+                    <p>Missed calls: <span id="missedLeads">0</span></p>
+                    <p>Lost revenue: <span id="lostRevenue">$0</span></p>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                    <h4 style="margin-bottom: 10px;">With AI</h4>
+                    <p>Additional deals: <span id="additionalDeals">0</span></p>
+                    <p>Added revenue: <span id="addedRevenue">$0</span></p>
+                </div>
+            </div>
+            
+            <div style="background: #28a745; color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h3 style="margin-bottom: 10px;">Net Result</h3>
+                <p style="font-size: 1.5em; margin: 0;">+<span id="netGain">$0</span> monthly • <span id="roiPercent">0</span>% ROI</p>
+                <p style="margin: 5px 0 0 0;">That's +<span id="annualGain">$0</span> annually!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function calculateROI() {
+    // Get inputs
+    const monthlyLeads = parseInt(document.getElementById('monthlyLeads').value) || 0;
+    const commission = parseInt(document.getElementById('commission').value) || 12000;
+    const conversionRate = 0.03;
+    const missedCallRate = 0.40;
+    const monthlyCost = 2000;
+    
+    if (monthlyLeads === 0) {
+        alert('Please enter your monthly phone leads');
+        return;
+    }
+    
+    // Calculations
+    const leadsMissed = monthlyLeads * missedCallRate;
+    const dealsLost = leadsMissed * conversionRate;
+    const revenueLost = dealsLost * commission;
+    const additionalRevenue = revenueLost;
+    const monthlyGain = additionalRevenue - monthlyCost;
+    const annualGain = monthlyGain * 12;
+    const roiPercentage = (monthlyGain / monthlyCost) * 100;
+    
+    // Generate Dynamic Summary
+    const summaryHTML = generateSummary(monthlyLeads, leadsMissed, revenueLost, monthlyGain, annualGain, roiPercentage);
+    document.getElementById('summary-content').innerHTML = summaryHTML;
+    
+    // Update Detailed Results
+    document.getElementById('missedLeads').textContent = Math.round(leadsMissed);
+    document.getElementById('lostRevenue').textContent = '$' + revenueLost.toLocaleString();
+    document.getElementById('additionalDeals').textContent = dealsLost.toFixed(1);
+    document.getElementById('addedRevenue').textContent = '$' + additionalRevenue.toLocaleString();
+    document.getElementById('netGain').textContent = '$' + monthlyGain.toLocaleString();
+    document.getElementById('annualGain').textContent = '$' + annualGain.toLocaleString();
+    document.getElementById('roiPercent').textContent = Math.round(roiPercentage);
+    
+    // Show results
+    document.getElementById('roi-summary').style.display = 'block';
+    document.getElementById('roi-results').style.display = 'block';
+    
+    // Scroll to results
+    document.getElementById('roi-summary').scrollIntoView({ behavior: 'smooth' });
+}
+
+function generateSummary(leads, missed, lost, gain, annual, roi) {
+    const scenarios = [
+        { min: 200, text: `high-volume team` },
+        { min: 100, text: `growing team` },
+        { min: 50, text: `established agent` },
+        { min: 0, text: `business` }
+    ];
+    
+    const scenario = scenarios.find(s => leads >= s.min) || scenarios[3];
+    
+    return `
+        <p><strong>For a ${scenario.text} with ${leads} monthly leads:</strong></p>
+        <p>📞 You're missing <strong>${Math.round(missed)} calls/month</strong> (40% missed rate)</p>
+        <p>💸 Costing you <strong>$${lost.toLocaleString()} in lost revenue</strong> monthly</p>
+        <p>🤖 Our AI Receptionist recovers these leads for $2,000/month</p>
+        <p>🎯 Generating a net gain of <strong>$${gain.toLocaleString()}/month (${Math.round(roi)}% ROI)</strong></p>
+        <p>💰 That's <strong>$${annual.toLocaleString()} additional annual revenue!</strong></p>
+    `;
+}
+</script>
 </body>
 </html>
